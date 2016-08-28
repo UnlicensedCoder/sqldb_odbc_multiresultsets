@@ -27,6 +27,8 @@ type
   private
     function OdbcNextResultSet: Boolean;
   public
+    // Get next resultset if it is exists.
+    // Return true if resultset has take, otherwise return false
     function NextResultSet: Boolean;
   end;
 
@@ -113,7 +115,6 @@ end;
 
 function TExSQLQuery.OdbcNextResultSet: Boolean;
 var
-  //conn: TODBCConnection;
   cur: TODBCCursorCrack;
   savedStmt: Pointer;
   res: SQLRETURN;
@@ -140,8 +141,9 @@ begin
   OdbcCheck(SQLFreeStmt(savedStmt, SQL_UNBIND));
   cur.FSTMTHandle := nil; // prevent from release this stmt on close
   Close;
-
   FieldDefs.Updated:= False;
+
+  // Reopen dataset and use next resultset.
   TExODBCConnection(Self.DataBase).FGetNext:= True;
   TExODBCConnection(Self.DataBase).FNextStmt:= savedStmt;
   try
